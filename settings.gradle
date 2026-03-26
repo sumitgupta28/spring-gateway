@@ -1,0 +1,5 @@
+rootProject.name = 'spring-gateway'
+
+include 'shopping-cart-service'
+include 'product-service'
+include 'spring-cloud-gateway'

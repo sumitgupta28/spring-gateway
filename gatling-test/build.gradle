@@ -1,0 +1,63 @@
+plugins {
+    id 'java'
+    id "io.gatling.gradle" version "3.9.5"
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'com.sg'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('gatlingVersion', '3.9.5')
+}
+
+dependencies {
+    implementation "io.gatling:gatling-core-java:${gatlingVersion}"
+    implementation "io.gatling:gatling-http:${gatlingVersion}"
+    implementation "io.gatling.highcharts:gatling-charts-highcharts:${gatlingVersion}"
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// Provide a task to run the Gatling runner directly via JavaExec
+tasks.register('runGatling', JavaExec) {
+    group = 'verification'
+    description = 'Run Gatling simulations via the GatlingRunner main'
+    classpath = sourceSets.main.get().runtimeClasspath
+    main = 'com.sg.gatling.GatlingRunner'
+}
+
+// Configure the shadowJar to produce an executable fat jar
+tasks.named('shadowJar') {
+    archiveBaseName.set('gatling-test')
+    archiveClassifier.set('all')
+    manifest {
+        attributes 'Main-Class': 'com.sg.gatling.GatlingRunner'
+    }
+}
+
+// Helper task to build the fat jar
+tasks.register('buildJar') {
+    group = 'build'
+    description = 'Build an executable fat JAR for GatlingRunner'
+    dependsOn tasks.named('shadowJar')
+    doLast {
+        def file = tasks.named('shadowJar').get().archiveFile.get().asFile
+        println "Built fat jar: ${file}"
+    }
+}

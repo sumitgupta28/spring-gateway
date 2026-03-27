@@ -1,0 +1,55 @@
+classDiagram
+  class Product {
+    +String id
+    +String name
+    +BigDecimal price
+    +int availableQuantity
+  }
+
+  class ProductRequest {
+    +String name
+    +BigDecimal price
+    +int availableQuantity
+  }
+
+  class ProductResponse {
+    +String id
+    +String name
+    +BigDecimal price
+    +int availableQuantity
+  }
+
+  class Cart {
+    +String cartId
+    +Collection~CartItem~ getItems()
+    +BigDecimal getTotal()
+    +void addItem(CartItem)
+    +void removeItem(String productId)
+    +void clear()
+  }
+
+  class CartItem {
+    +String productId
+    +String name
+    +BigDecimal price
+    +int quantity
+  }
+
+  class AddItemRequest {
+    +String productId
+    +String name
+    +BigDecimal price
+    +int quantity
+  }
+
+  class CheckoutResponse {
+    +String cartId
+    +BigDecimal total
+    +List~CartItem~ items
+  }
+
+  Product -- ProductRequest
+  Product <|-- ProductResponse
+  Cart *-- CartItem
+  CartItem <|-- AddItemRequest
+  CheckoutResponse "1" *-- "*" CartItem

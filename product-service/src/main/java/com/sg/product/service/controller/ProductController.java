@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping(path = "/api/products", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
@@ -39,14 +41,14 @@ public class ProductController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<ProductResponse>> create(@RequestBody ProductRequest req) {
+    public Mono<ResponseEntity<ProductResponse>> create(@Valid @RequestBody ProductRequest req) {
         log.info("Create product name={}", req.getName());
         return service.create(req)
                 .map(p -> new ResponseEntity<>(toResponse(p), HttpStatus.CREATED));
     }
 
     @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<ProductResponse>> update(@PathVariable String id, @RequestBody ProductRequest req) {
+    public Mono<ResponseEntity<ProductResponse>> update(@PathVariable String id, @Valid @RequestBody ProductRequest req) {
         log.info("Update product id={}", id);
         return service.update(id, req)
                 .map(p -> ResponseEntity.ok(toResponse(p)))
@@ -60,4 +62,3 @@ public class ProductController {
                 .then(Mono.just(new ResponseEntity<Void>(HttpStatus.NO_CONTENT)));
     }
 }
-

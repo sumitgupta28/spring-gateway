@@ -1,0 +1,26 @@
+sequenceDiagram
+  participant Gatling
+  participant Gateway
+  participant ProductService
+  participant CartService
+
+  Gatling->>Gateway: many concurrent GET /api/products
+  Gateway->>ProductService: GET /api/products
+  ProductService->>ProductRepo: findAll()
+  ProductRepo-->>ProductService: list
+  ProductService-->>Gateway: 200 OK
+  Gateway-->>Gatling: 200 OK
+
+  Gatling->>Gateway: concurrent POST /api/carts (create)
+  Gateway->>CartService: createCart()
+  CartService->>CartRepo: save(new cart)
+  CartRepo-->>CartService: Mono<Cart>
+  CartService-->>Gateway: 200 OK {cartId}
+  Gateway-->>Gatling: 200 OK {cartId}
+
+  Gatling->>Gateway: concurrent POST /api/carts/{cartId}/items
+  Gateway->>CartService: addItem(...)
+  CartService->>CartRepo: findById & save
+  CartRepo-->>CartService: Mono<Cart>
+  CartService-->>Gateway: 201 Created
+  Gateway-->>Gatling: 201 Created

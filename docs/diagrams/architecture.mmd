@@ -1,0 +1,18 @@
+flowchart LR
+  A[Client / Browser / Gatling] -->|HTTP| G["spring-cloud-gateway (8080)"]
+  G --> P["product-service (8082)"]
+  G --> C["shopping-cart-service (8081)"]
+
+  subgraph Services
+    P --> PR[InMemoryProductRepository]
+    C --> CR[InMemoryCartRepository]
+  end
+
+  A -. Gatling tests .-> GT["gatling-test (java jar)"]
+  GT -->|HTTP| G
+
+  fileScripts["start-all.sh / stop-all.sh / start-gatling.sh"] --> G
+  fileScripts --> P
+  fileScripts --> C
+
+  logs[logs/*] -->|captures stdout/stderr| fileScripts

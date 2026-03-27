@@ -9,13 +9,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping(path = "/api/carts", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class CartController {
     private final CartService service;
 
@@ -40,7 +44,7 @@ public class CartController {
     }
 
     @PostMapping(path = "/{cartId}/items", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<Cart>> addItem(@PathVariable String cartId, @RequestBody AddItemRequest req) {
+    public Mono<ResponseEntity<Cart>> addItem(@PathVariable String cartId, @Valid @RequestBody AddItemRequest req) {
         log.info("Received request: addItem cartId={} productId={} qty={}", cartId, req.getProductId(), req.getQuantity());
         return service.addItem(cartId, req)
                 .doOnSuccess(c -> log.debug("Added item productId={} to cartId={} totalItems={}", req.getProductId(), cartId, c.getItems().size()))

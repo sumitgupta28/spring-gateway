@@ -1,0 +1,30 @@
+sequenceDiagram
+  participant Client
+  participant Gateway
+  participant CartService
+  participant CartRepo
+
+  Client->>Gateway: POST /api/carts
+  Gateway->>CartService: createCart()
+  CartService->>CartRepo: save(new Cart(cartId))
+  CartRepo-->>CartService: Mono<Cart>
+  CartService-->>Gateway: 200 OK {cartId}
+  Gateway-->>Client: 200 OK {cartId}
+
+  Client->>Gateway: POST /api/carts/{cartId}/items (AddItemRequest)
+  Gateway->>CartService: addItem(cartId, AddItemRequest)
+  CartService->>CartRepo: findById(cartId)
+  CartRepo-->>CartService: Mono<Cart>
+  CartService->>CartRepo: save(cart with merged item)
+  CartRepo-->>CartService: Mono<Cart>
+  CartService-->>Gateway: 201 Created {Cart}
+  Gateway-->>Client: 201 Created {Cart}
+
+  Client->>Gateway: POST /api/carts/{cartId}/checkout
+  Gateway->>CartService: checkout(cartId)
+  CartService->>CartRepo: findById(cartId)
+  CartRepo-->>CartService: Mono<Cart>
+  CartService->>CartRepo: save(cart clear state)
+  CartRepo-->>CartService: Mono<Void>
+  CartService-->>Gateway: 200 OK {CheckoutResponse}
+  Gateway-->>Client: 200 OK {CheckoutResponse}

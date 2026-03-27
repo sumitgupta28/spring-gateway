@@ -19,6 +19,8 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    // Validation (Jakarta Validation)
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok:1.18.30'
@@ -34,4 +36,3 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
-
